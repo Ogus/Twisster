@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta  name="Author" content="Gab & Gus">
+	<meta name="Description" content="Tweeter comme Pesquet ? Tout le monde peut le faire, grâce à Space Tweet !">
+	<!-- <link rel="shortcut icon" href="images/favicon.png"> -->
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+	<link rel="stylesheet" href="style.css">
+
+	<script src="js/maps.js"></script>
+  <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+	<title>Space Tweet - Tweet comme Pesquet !</title>
+</head>
+
+<body>
+	<header>
+	  <h1>Sweeet</h1>
+		<!-- <p>Voyagez à bord de l'ISS et faites des tweet comme Thomas Pesquet !</p> -->
+
+		<div id="location">
+			<img src="img/location.png" alt="Icone position"/>
+			<div>
+				<p id="lat"><span>Latitude:</span></p>
+				<p id="long"><span>Longitude:</span></p>
+			</div>
+		</div>
+	</header>
+
+	<div id="content">
+
+	<section>
+		<div id="map"></div>
+	</section>
+
+  <section id="option_wrap">
+		<div>
+			<h2>Zoom</h2>
+
+			<form id="zoom_form">
+				<input type='radio' name='zoom' value=3 id='zoom1' checked="checked"><label for='zoom1'>Monde</label>
+				<input type='radio' name='zoom' value=7 id='zoom2'><label for='zoom2'>Pays</label>
+				<input type='radio' name='zoom' value=10 id='zoom3'><label for='zoom3'>Région</label>
+				<input type='radio' name='zoom' value=13 id='zoom4'><label for='zoom4'>Ville</label>
+			</form>
+		</div>
+
+		<div>
+			<h2>Déplacement</h2>
+
+			<div id="follow_form">
+				<p>Suivre l'ISS</p>
+				<label class="switch">
+				  <input type="checkbox" id="follow"> <div class="slider"></div>
+				</label>
+			</div>
+		</div>
+
+		<p id="tweet_button">Tweet comme Pesquet</p>
+
+  </section>
+
+	</div>
+
+	<div id="overlay">
+		<div id="preview">
+			<p>lorem ipsum dolor sit amet</p>
+			<img id="preview_img" src="img/map_icon.png" alt="prévisualisation"/>
+			<div>
+				<p id="preview_dismiss">Annuler</p> <p id="preview_accept">Valider</p>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
