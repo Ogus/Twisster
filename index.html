@@ -12,12 +12,12 @@
 
 	<script src="js/maps.js"></script>
   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-	<title>Space Tweet - Tweet comme Pesquet !</title>
+	<title>TwISSter - Les tweet de l'ISS</title>
 </head>
 
 <body>
 	<header>
-	  <h1>Sweeet</h1>
+	  <h1>TwISSter</h1>
 		<!-- <p>Voyagez à bord de l'ISS et faites des tweet comme Thomas Pesquet !</p> -->
 
 		<div id="location">
@@ -66,11 +66,17 @@
 
 	<div id="overlay">
 		<div id="preview">
-			<p>lorem ipsum dolor sit amet</p>
+			<p id="preview_txt">lorem ipsum dolor sit amet</p>
 			<img id="preview_img" src="img/map_icon.png" alt="prévisualisation"/>
 			<div>
 				<p id="preview_dismiss">Annuler</p> <p id="preview_accept">Valider</p>
 			</div>
+		</div>
+
+		<div class="loading">
+			<div></div><div></div><div></div>
+			<div></div><div></div><div></div>
+			<div></div><div></div><div></div>
 		</div>
 	</div>
 
