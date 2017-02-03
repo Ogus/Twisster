@@ -31,26 +31,25 @@
 
 	<div id="content">
 
-	<section>
+	<section id="map_wrap">
 		<div id="map"></div>
 	</section>
 
   <section id="option_wrap">
 		<div>
-			<h2>Zoom</h2>
-
-			<form id="zoom_form">
-				<input type='radio' name='zoom' value=3 id='zoom1' checked="checked"><label for='zoom1'>Monde</label>
-				<input type='radio' name='zoom' value=7 id='zoom2'><label for='zoom2'>Pays</label>
-				<input type='radio' name='zoom' value=10 id='zoom3'><label for='zoom3'>Région</label>
-				<input type='radio' name='zoom' value=13 id='zoom4'><label for='zoom4'>Ville</label>
-			</form>
+			<h2>Carte</h2>
+			<div id="tile_option" class="option input_option">
+				<input type='radio' name='tile' value="mapbox.streets" id='tile1' checked="checked"><label for='tile1'>Street Map</label>
+				<input type='radio' name='tile' value="mapbox.satellite" id='tile2'><label for='tile2'>Satellite</label>
+				<input type='radio' name='tile' value="mapbox.mapbox-terrain-v2" id='tile3'><label for='tile3'>Terrain</label>
+			</div>
 		</div>
+
+		<div class="separator"></div>
 
 		<div>
 			<h2>Déplacement</h2>
-
-			<div id="follow_form">
+			<div id="follow_option" class="option">
 				<p>Suivre l'ISS</p>
 				<label class="switch">
 				  <input type="checkbox" id="follow"> <div class="slider"></div>
@@ -58,7 +57,19 @@
 			</div>
 		</div>
 
-		<p id="tweet_button">Tweet comme Pesquet</p>
+		<div class="separator"></div>
+
+		<form id="zoom_option">
+			<h2>Zoom</h2>
+			<div class="option input_option">
+				<input type='radio' name='zoom' value=3 id='zoom1' checked="checked"><label for='zoom1'>Monde</label>
+				<input type='radio' name='zoom' value=7 id='zoom2'><label for='zoom2'>Pays</label>
+				<input type='radio' name='zoom' value=10 id='zoom3'><label for='zoom3'>Région</label>
+				<input type='radio' name='zoom' value=13 id='zoom4'><label for='zoom4'>Ville</label>
+			</div>
+
+			<input type=submit value="Tweet comme Pesquet" id="tweet_button">
+		</form>
 
   </section>
 

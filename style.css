@@ -33,6 +33,25 @@ header h1{
 	-webkit-transform: translateY(-50%);
 }
 
+h2{
+  padding: 0;
+  margin: 10px 0;
+  color: #4885ed;
+  text-align: center;
+  font-size: 4vh;
+}
+
+section{
+  position: relative;
+  padding: 3vh;
+  background: #fff;
+  /*outline: 3px dashed #31302b;
+	outline-offset: -8px;*/
+  transition: 0.25s;
+  -webkit-transition: 0.25s;
+  box-shadow: 5px 5px 10px #252525;
+}
+
 #location{
   position: absolute;
   top: 50%;
@@ -64,26 +83,18 @@ header h1{
   position: relative;
   display: flex;
   flex-flow: row nowrap;
-  justify-content: space-around;;
+  justify-content: space-around;
   align-items: center;
   width: 100%;
   height: 89%;
-  background: url('img/back_grid.png') repeat;
+  background: url('img/back_wood.png') repeat;
 }
 
-section{
-  position: relative;
-  width: 33vw;
-  height: 33vw;
-  padding: 3vh;
-  background: #fff;
-  /*outline: 3px dashed #31302b;
-	outline-offset: -8px;*/
-  transition: 0.25s;
-  -webkit-transition: 0.25s;
-  box-shadow: 5px 5px 10px #252525;
-}
 
+#map_wrap{
+  width: 55%;
+  height: 90%;
+}
 #map{
   height: 100%;
   width: 100%;
@@ -95,110 +106,31 @@ section{
   display: flex;
   flex-flow: column nowrap;
   justify-content: space-around;
-}
-#option_wrap>div{
-  padding-bottom: 10px;
-  border-bottom: 2px solid rgba(0,0,0,0.5);
+  width: 30%;
+  height: 80%;
 }
 
-h2{
-  padding: 0;
-  margin: 10px 0;
-  color: #4885ed;
-  text-align: center;
-  font-size: 4vh;
-}
-
-#zoom_form, #follow_form{
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-around;
-  align-items: center;
-  width: 100%;
-}
-#zoom_form label{
-	position: relative;
-	margin: 0;
-	padding: 0.6vh 0.5vw;
-  font-size: 3vh;
-  color: #000;
-	cursor: pointer;
-  border: 3px solid rgba(0,0,0,0);
-  box-shadow: inset 0 0 0 #4885ed;
-	transition: box-shadow 0.25s, color 0.25s;
-	-webkit-transition: box-shadow 0.25s, color 0.25s;
-}
-#zoom_form label:hover,#zoom_form label:active{
-	border-bottom-color: #4885ed;
-}
-#zoom_form input[type="radio"]{
-	display: none;
-}
-#zoom_form input[type="radio"]:checked + label{
-  color: #fff;
-	border-color: #4885ed;
-  box-shadow: inset 0 -7vh 0 #4885ed;
-}
-
-#follow_form>p{
-  font-size: 3vh;
+#follow_option>p{
+  font-size: 2.7vh;
 }
 
 #tweet_button{
   display: block;
-  padding: 0.6vh 0;
-  margin: 0 3vw;
+  padding: 0.6vh 0.6vw;
+  margin: 10% auto 0 auto;
   text-align: center;
   text-transform: uppercase;
+  font-size: 3.2vh;
+  color: #3cba54;
+  background: #fff;
+  border: 0.5vh solid #3cba54;
+  cursor: pointer;
+	transition: all 0.25s;
+	-webkit-transition: all 0.25s;
+}
+#tweet_button:hover, #tweet_button:active{
   color: #fff;
-  font-size: 3.5vh;
   background: #3cba54;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.switch{
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 30px;
-}
-.switch input{display:none;}
-
-.slider{
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  border-radius: 30px;
-  transition: 0.25s;
-  -webkit-transition: 0.25s;
-}
-.slider:before{
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 5px;
-  bottom: 5px;
-  background-color: white;
-  border-radius: 50%;
-  transition: 0.25s;
-  -webkit-transition: 0.25s;
-}
-
-.switch input:checked + .slider {
-  background-color: #4885ed;
-}
-.switch input:focus + .slider {
-  box-shadow: 0 0 1px #4885ed;
-}
-.switch input:checked + .slider:before {
-  transform: translateX(30px);
-  -webkit-transform: translateX(30px);
 }
 
 
@@ -268,6 +200,92 @@ h2{
   background: #3cba54;
 }
 
+.separator{
+  display: block;
+  width: 80%;
+  height: 0.5%;
+  margin: 0 auto;
+  padding: 0;
+  background: rgba(0,0,0,0.5);
+}
+
+.option{
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+}
+
+.input_option label{
+	position: relative;
+	margin: 0;
+	padding: 0.6vh 0.5vw;
+  font-size: 3vh;
+  color: #000;
+	cursor: pointer;
+  border: 3px solid rgba(0,0,0,0);
+  box-shadow: inset 0 0 0 #4885ed;
+	transition: box-shadow 0.25s, color 0.25s;
+	-webkit-transition: box-shadow 0.25s, color 0.25s;
+}
+.input_option label:hover,.input_option label:active{
+	border-bottom-color: #4885ed;
+}
+.input_option input[type="radio"]{ display: none; }
+.input_option input[type="radio"]:checked + label{
+  color: #fff;
+	border-color: #4885ed;
+  box-shadow: inset 0 -7vh 0 #4885ed;
+}
+
+
+.switch{
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+.switch input{display:none;}
+
+.slider{
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 30px;
+  transition: 0.25s;
+  -webkit-transition: 0.25s;
+}
+.slider:before{
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 5px;
+  bottom: 5px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.25s;
+  -webkit-transition: 0.25s;
+}
+
+.switch input:checked + .slider {
+  background-color: #4885ed;
+}
+.switch input:focus + .slider {
+  box-shadow: 0 0 1px #4885ed;
+}
+.switch input:checked + .slider:before {
+  transform: translateX(30px);
+  -webkit-transform: translateX(30px);
+}
+
+
+
 .hashtag{
   font-weight: bold;
   color: #4885ed;
@@ -294,18 +312,18 @@ h2{
 	opacity: 0;
 	transform: translateY(-20px);
 	-webkit-transform: translateY(-20px);
-  	animation: box_fusion 3.2s ease infinite;
-  	-moz-animation: box_fusion 3.2s ease infinite;
-  	-webkit-animation:  box_fusion 3.2s ease infinite;
+  	animation: box_fusion 2.4s ease infinite;
+  	-moz-animation: box_fusion 2.4s ease infinite;
+  	-webkit-animation:  box_fusion 2.4s ease infinite;
 }
-.loading div:nth-child(1){animation-delay: 1200ms;}
-.loading div:nth-child(2){animation-delay: 1400ms;}
-.loading div:nth-child(3){animation-delay: 1600ms;}
-.loading div:nth-child(4){animation-delay: 600ms;}
-.loading div:nth-child(5){animation-delay: 800ms;}
-.loading div:nth-child(6){animation-delay: 1000ms;}
-.loading div:nth-child(8){animation-delay: 200ms;}
-.loading div:nth-child(9){animation-delay: 400ms;}
+.loading div:nth-child(1){animation-delay: 900ms;}
+.loading div:nth-child(2){animation-delay: 1050ms;}
+.loading div:nth-child(3){animation-delay: 1200ms;}
+.loading div:nth-child(4){animation-delay: 450ms;}
+.loading div:nth-child(5){animation-delay: 600ms;}
+.loading div:nth-child(6){animation-delay: 750ms;}
+.loading div:nth-child(8){animation-delay: 150ms;}
+.loading div:nth-child(9){animation-delay: 300ms;}
 
 
 
