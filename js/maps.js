@@ -4,16 +4,17 @@ window.onload = function(){
   var lat_text = document.getElementById("lat");
   var long_text = document.getElementById("long");
 
+  var tile_list = document.getElementsByName("tile");
   var zoom_list = document.getElementsByName("zoom");
   var follow_option = document.getElementById("follow");
   var tweet_button = document.getElementById("tweet_button");
 
   var prev_dismiss = document.getElementById("preview_dismiss");
-    var prev_accept = document.getElementById("preview_accept");
+  var prev_accept = document.getElementById("preview_accept");
 
   var map_layer, tile_layer, marker,polyline;
   var ajax_position, ajax_geoname, json_resul;
-  var position={lat: 999, lng: 0}, old_position={lat: 0, lng: 0}, zoom_level = 3;
+  var position={lat: 999, lng: 0}, old_position={lat: 0, lng: 0}, zoom_level = 3, tile_layer_option = "street";
 
   var loaded = false;
 
@@ -29,16 +30,19 @@ window.onload = function(){
   });
 
 
+
   init();
   function init(){    //initialisation des écouteurs d'évènements et de la carte
+    for(var i=0; i<tile_list.length; i++){
+      tile_list[i].addEventListener('click', set_tile_layer, false);
+    }
+
     for(var i=0; i<zoom_list.length; i++){
       zoom_list[i].addEventListener('click', set_zoom, false);
     }
 
     follow_option.addEventListener('click', function(){
-      if(follow_option.checked == true){
-        map_layer.panTo(position);
-      }
+      if(follow_option.checked == true){ map_layer.panTo(position); }
     }, false);
 
     tweet_button.addEventListener('click', generate_tweet, false);    //bouton pour lancer la génération du tweet
@@ -59,17 +63,18 @@ window.onload = function(){
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
       maxZoom:18,
     	minZoom:1,
-    	id:'mapbox.streets',   //mapbox.mapbox-streets-v7  //mapbox.mapbox-terrain-v2  //mapbox.satellite
+    	id:tile_layer_option,   //mapbox.mapbox-streets-v7  //mapbox.mapbox-terrain-v2  //mapbox.satellite   //mapbox.streets
     	accessToken: 'pk.eyJ1IjoiY2FzdG9yYm90IiwiYSI6ImNpaWkweWQ5ajAwaHV1NmtueHV1MHowcHgifQ.2l9JrRXro_ve9S_pMdTB0Q'
     	});
     tile_layer.addTo(map_layer);
 
     set_zoom();
+    set_tile_layer();
     update();
   }
 
-  window.onload = set_size();
-  window.onresize = set_size;
+  // window.onload = set_size();
+  // window.onresize = set_size;
 
   //recalcule les dimensions de certains éléments
   function set_size(){
@@ -95,6 +100,27 @@ window.onload = function(){
 
     if(follow_option.checked == true){ map_layer.panTo(position); }
   }
+
+  function set_tile_layer(){
+    for(var i=0; i<tile_list.length; i++){
+      if(tile_list[i].checked == true){
+        if(tile_layer_option == tile_list[i].value){ return; }
+        else{ tile_layer_option = tile_list[i].value; }
+      }
+    }
+    map_layer.removeLayer(tile_layer);
+
+    tile_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      maxZoom:18,
+    	minZoom:1,
+    	id:tile_layer_option,
+    	accessToken: 'pk.eyJ1IjoiY2FzdG9yYm90IiwiYSI6ImNpaWkweWQ5ajAwaHV1NmtueHV1MHowcHgifQ.2l9JrRXro_ve9S_pMdTB0Q'
+    	});
+    map_layer.addLayer(tile_layer)
+  }
+
+
 
   //boucle de requêtes sur la position de l'ISS
   function update(){
@@ -123,7 +149,7 @@ window.onload = function(){
 
     if(follow_option.checked == true){ map_layer.panTo(position); }     //on change le cadrage de la carte pour suivre l'ISS
 
-    if( !(Math.sign(old_position) != Math.sign(position) && Math.abs(position) > 150) && old_position.lat != 999){
+    if( !(Math.sign(old_position.lng) != Math.sign(position.lng) && Math.abs(position.lng) > 150) && old_position.lat != 999){
       L.polyline([old_position,position], {color: 'green'}).addTo(map_layer);
     }
 
@@ -132,8 +158,12 @@ window.onload = function(){
   }
 
 
+
+
   //génère un faux tweet lors du clique sur le bouton 'tweet comme pesquet'
-  function generate_tweet(){
+  function generate_tweet(e){
+    e.preventDefault();
+
     document.getElementById("overlay").style.top = "0";
     document.getElementsByClassName("loading")[0].style.display = "flex";
     load_image();
@@ -144,14 +174,14 @@ window.onload = function(){
   function load_image(){
     zoom_level = map_layer.getZoom();
 
-    var bearing = 360*Math.random();
+    var bearing = Math.floor(360*Math.random());
     var url = "https://api.mapbox.com/styles/v1/castorbot/ciylak035004z2ro27w5r5p5s/static/"    //url de l'image statique
                 +String(position.lng)+","    //position
                 +String(position.lat)+","
                 +String(zoom_level)+","   //zoom
                 +String(bearing)     //bearing
                 // +","+String(0.0)          //pitch
-                +"/400x400"
+                +"/600x600"
                 +"?access_token=pk.eyJ1IjoiY2FzdG9yYm90IiwiYSI6ImNpaWkweWQ5ajAwaHV1NmtueHV1MHowcHgifQ.2l9JrRXro_ve9S_pMdTB0Q&attribution=false&logo=false";
 
     var img = document.getElementById("preview_img");
@@ -179,7 +209,7 @@ window.onload = function(){
       if(ajax_geoname.readyState == 4 && ajax_geoname.status == 200){
         var xml = ajax_geoname.responseXML;
         var json_text = JSON.stringify(xml_to_json(xml));   //conversion du xml en json
-        // console.log(json_text);
+        console.log(json_text);
         var geonames = JSON.parse(json_text).geonames;
         var location, hashtag;
 
@@ -213,6 +243,9 @@ window.onload = function(){
 
     ajax_geoname.send();
   }
+
+
+
 
 
   //function recursive pour convertir un fichier xml en json
