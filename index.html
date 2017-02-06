@@ -3,21 +3,23 @@
 <head>
 	<meta charset="UTF-8">
 	<meta  name="Author" content="Gab & Gus">
-	<meta name="Description" content="Tweeter comme Pesquet ? Tout le monde peut le faire, grâce à Space Tweet !">
-	<!-- <link rel="shortcut icon" href="images/favicon.png"> -->
+	<meta name="Description" content="twISSter est l'application qui permet de recrééer des tweets des l'ISS, comme l'astronaute français Tomas Pesquet">
+	<link rel="shortcut icon" href="img/favicon.ico">
 
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
 	<link rel="stylesheet" href="style.css">
 
+	<script src="js/location.js"></script>
 	<script src="js/maps.js"></script>
   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-	<title>TwISSter - Les tweet de l'ISS</title>
+	<title>twISSter - Les tweets de l'ISS</title>
 </head>
 
 <body>
 	<header>
-	  <h1>TwISSter</h1>
+		<img src="img/logo.png" alt="logo" id="logo">
+	  <h1>twISSter</h1>
 		<!-- <p>Voyagez à bord de l'ISS et faites des tweet comme Thomas Pesquet !</p> -->
 
 		<div id="location">
@@ -27,7 +29,22 @@
 				<p id="long"><span>Longitude:</span></p>
 			</div>
 		</div>
+
+		<div id="debug">
+			<div id="debug_button">
+				<input type='checkbox'id='debug_checkbox'><label for="debug_checkbox">Debug</label>
+			</div>
+
+			<div id='debug_slider'>
+				<div>
+					<label for='time_factor'>Facteur de temps:</label>
+					<output type='txt' id='txt_factor' value='10'>10</output>
+				</div>
+				<input id='time_factor' type='range' min='1' max='40' value='10' step='1' oninput='txt_factor.value = this.value'></input>
+			</div>
+		</div>
 	</header>
+
 
 	<div id="content">
 
@@ -70,7 +87,6 @@
 
 			<input type=submit value="Tweet comme Pesquet" id="tweet_button">
 		</form>
-
   </section>
 
 	</div>

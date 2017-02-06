@@ -24,7 +24,7 @@ header{
 header h1{
   position: absolute;
   top: 50%;
-  left: 2%;
+  left: calc(2% + 9vh);
   margin: 0;
   padding: 0;
   font-size: 5vh;
@@ -52,6 +52,16 @@ section{
   box-shadow: 5px 5px 10px #252525;
 }
 
+#logo{
+  position: absolute;
+  top: 50%;
+  left: 1%;
+  width: 9vh;
+  height: 9vh;
+  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+}
+
 #location{
   position: absolute;
   top: 50%;
@@ -75,8 +85,59 @@ section{
   font-size: 2vh;
   color: #fafafa;
 }
-#location span{
+#location span{ font-weight: bold; }
+
+#debug{
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  transform: translate(68%, -50%);
+  -webkit-transform: translate(68%, -50%);
+	transition: all 0.25s;
+	-webkit-transition: all 0.25s;
+}
+
+#debug_button label{
+  margin: 0;
+  padding: 0.6vh 0.5vw;
+  background: #4885ed;
+  color: #fff;
+  text-transform: capitalize;
+  font-size: 3vh;
   font-weight: bold;
+  border: 3px solid rgba(0,0,0,0);
+	cursor: pointer;
+	transition: all 0.25s;
+	-webkit-transition: all 0.25s;
+}
+#debug_button label:hover,#debug_button label:active{
+	border-color: #fff;
+}
+#debug_button input{ display: none; }
+#debug_button input:checked + label{
+  background: #fff;
+  color: #4885ed;
+	border-color: #fff;
+}
+
+#debug_slider{
+  display: flex;
+  flex-flow: column nowrap;
+  margin: 0 0 0 1vw;
+  padding: 0 0 0 1vw;
+  /*border-left: 1px solid #fff;*/
+}
+#debug_slider label, #debug_slider output{
+  font-size: 2.5vh;
+  color: #fff;
+}
+#debug_slider input{
+  appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
 }
 
 #content{
@@ -128,7 +189,7 @@ section{
 	transition: all 0.25s;
 	-webkit-transition: all 0.25s;
 }
-#tweet_button:hover, #tweet_button:active{
+#tweet_button:hover, #tweet_button:focus, #tweet_button:active{
   color: #fff;
   background: #3cba54;
 }

@@ -4,6 +4,9 @@ window.onload = function(){
   var lat_text = document.getElementById("lat");
   var long_text = document.getElementById("long");
 
+  var debug_option = document.getElementById("debug_checkbox");
+  var time_factor = document.getElementById("time_factor");
+
   var tile_list = document.getElementsByName("tile");
   var zoom_list = document.getElementsByName("zoom");
   var follow_option = document.getElementById("follow");
@@ -13,7 +16,7 @@ window.onload = function(){
   var prev_accept = document.getElementById("preview_accept");
 
   var map_layer, tile_layer, marker,polyline;
-  var ajax_position, ajax_geoname, json_resul;
+  var ajax_position, ajax_geoname;
   var position={lat: 999, lng: 0}, old_position={lat: 0, lng: 0}, zoom_level = 3, tile_layer_option = "street";
 
   var loaded = false;
@@ -50,7 +53,11 @@ window.onload = function(){
     prev_dismiss.addEventListener('click', function(){    //bouton pour annuler le tweet
     window.setTimeout(function(){ document.getElementById("overlay").style.top = "100%"; }, 800);
       document.getElementById("preview").style.top = "150%";
-    })
+    });
+
+    debug_option.addEventListener('change', function(){
+      set_debug();
+    }, false);
 
 
     map_layer = L.map('map').setView([48.853, 2.345], zoom_level);
@@ -69,25 +76,11 @@ window.onload = function(){
     tile_layer.addTo(map_layer);
 
     set_zoom();
+    set_debug();
     set_tile_layer();
     update();
   }
 
-  // window.onload = set_size();
-  // window.onresize = set_size;
-
-  //recalcule les dimensions de certains éléments
-  function set_size(){
-    var window_w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    var window_h = window.innerHeight || document.documentElement.clientHeight || document.body.clienHeight;
-    var scale = Math.min(window_h*0.7,window_w*0.35);
-
-    var temp = document.getElementsByTagName("section");
-    for(var i=0; i<temp.length; i++){
-      temp[i].style.width = String(scale) + "px";
-      temp[i].style.height = String(scale) + "px";
-    }
-  }
 
   //change le zoom de la carte lors du clique sur un radio button
   function set_zoom(){
@@ -99,6 +92,18 @@ window.onload = function(){
     map_layer.setZoom(zoom_level);
 
     if(follow_option.checked == true){ map_layer.panTo(position); }
+  }
+
+  function set_debug(){
+    clear_map();
+    if(debug_option.checked){
+      document.getElementById("debug").style.transform = "translate(0, -50%)";
+      document.getElementById("debug").style.webkitTransform = "translate(0, -50%)";
+    }
+    else{
+      document.getElementById("debug").style.transform = "translate(68%, -50%)";
+      document.getElementById("debug").style.webkitTransform = "translate(68%, -50%)";
+    }
   }
 
   function set_tile_layer(){
@@ -117,30 +122,50 @@ window.onload = function(){
     	id:tile_layer_option,
     	accessToken: 'pk.eyJ1IjoiY2FzdG9yYm90IiwiYSI6ImNpaWkweWQ5ajAwaHV1NmtueHV1MHowcHgifQ.2l9JrRXro_ve9S_pMdTB0Q'
     	});
-    map_layer.addLayer(tile_layer)
+    map_layer.addLayer(tile_layer);
+  }
+
+  function clear_map() {
+    for(i in map_layer._layers) {
+      if(map_layer._layers[i]._path != undefined){
+        try { map_layer.removeLayer(map_layer._layers[i]); }
+        catch(e){ console.log("problem with " + e + map_layer._layers[i]); }
+      }
+    }
   }
 
 
 
   //boucle de requêtes sur la position de l'ISS
   function update(){
-    ajax_position = new XMLHttpRequest();
-    ajax_position.open("GET","http://api.open-notify.org/iss-now.json",true);
+    if(debug_option.checked){    // utilise l'API de position de l'ISS 'faite maison'
+      old_position.lat = position.lat;
+      old_position.lng = position.lng;
+      var result = Location.update_iss(time_factor.value);
 
-    ajax_position.onreadystatechange = function(){
-      if(ajax_position.readyState == 4 && ajax_position.status == 200){
-        json_result = JSON.parse(ajax_position.responseText);    //on récupère la position au format json
+      position.lat = (result.latitude).toFixed(5);
+      position.lng = (result.longitude).toFixed(5);
+      update_map();
+    }
+    else{   // utilise l'API officielle pour avoir la position de l'ISS
+      ajax_position = new XMLHttpRequest();
+      ajax_position.open("GET","http://api.open-notify.org/iss-now.json",true);
 
-        old_position.lat = position.lat;
-        old_position.lng = position.lng;
-        position.lat = json_result.iss_position.latitude;
-        position.lng = json_result.iss_position.longitude;
-        update_map();
-      }
-    };
-    ajax_position.send();
+      ajax_position.onreadystatechange = function(){
+        if(ajax_position.readyState == 4 && ajax_position.status == 200){
+          var json_result = JSON.parse(ajax_position.responseText);    //on récupère la position au format json
 
-    window.setTimeout(update, 3000);    //màj toute les 3 secondes
+          old_position.lat = position.lat;
+          old_position.lng = position.lng;
+          position.lat = json_result.iss_position.latitude;
+          position.lng = json_result.iss_position.longitude;
+          update_map();
+        }
+      };
+      ajax_position.send();
+    }
+
+    window.setTimeout(update, 2000);    //màj toute les 2 secondes
   }
 
   //màj de la carte à chaque nouvelle position de l'ISS
@@ -149,7 +174,7 @@ window.onload = function(){
 
     if(follow_option.checked == true){ map_layer.panTo(position); }     //on change le cadrage de la carte pour suivre l'ISS
 
-    if( !(Math.sign(old_position.lng) != Math.sign(position.lng) && Math.abs(position.lng) > 150) && old_position.lat != 999){
+    if( !(Math.sign(old_position.lng) != Math.sign(position.lng) && Math.abs(position.lng) > 150) && Math.abs(position.lat - old_position.lat) < 7){
       L.polyline([old_position,position], {color: 'green'}).addTo(map_layer);
     }
 
@@ -163,34 +188,35 @@ window.onload = function(){
   //génère un faux tweet lors du clique sur le bouton 'tweet comme pesquet'
   function generate_tweet(e){
     e.preventDefault();
-
-    document.getElementById("overlay").style.top = "0";
-    document.getElementsByClassName("loading")[0].style.display = "flex";
-    load_image();
-    load_geoname();
+    if(position.lat != 999){
+      document.getElementById("overlay").style.top = "0";
+      document.getElementsByClassName("loading")[0].style.display = "flex";
+      load_image();
+      load_geoname();
+    }
   }
 
   //charge l'image satellite
   function load_image(){
     zoom_level = map_layer.getZoom();
 
-    var bearing = Math.floor(360*Math.random());
-    var url = "https://api.mapbox.com/styles/v1/castorbot/ciylak035004z2ro27w5r5p5s/static/"    //url de l'image statique
+    var bearing = 90 - Math.floor(180*Math.random());   // entre -180 et 180 degrés, pour garder la photo 'à l'endroit'
+    var url = "https://api.mapbox.com/styles/v1/castorbot/ciylak035004z2ro27w5r5p5s/static/"
                 +String(position.lng)+","    //position
                 +String(position.lat)+","
                 +String(zoom_level)+","   //zoom
-                +String(bearing)     //bearing
+                +String(bearing)        //bearing
                 // +","+String(0.0)          //pitch
-                +"/600x600"
-                +"?access_token=pk.eyJ1IjoiY2FzdG9yYm90IiwiYSI6ImNpaWkweWQ5ajAwaHV1NmtueHV1MHowcHgifQ.2l9JrRXro_ve9S_pMdTB0Q&attribution=false&logo=false";
+                +"/800x800"
+                +"?access_token=pk.eyJ1IjoiY2FzdG9yYm90IiwiYSI6ImNpaWkweWQ5ajAwaHV1NmtueHV1MHowcHgifQ.2l9JrRXro_ve9S_pMdTB0Q&attribution=true&logo=false";
 
     var img = document.getElementById("preview_img");
     img.src = url;
+    loaded = false;
     img.addEventListener('load', function(){      //on attend que l'image soit chargé avant de montrer le faux tweet
       if(loaded){
         document.getElementById("preview").style.top = "50%";
         document.getElementsByClassName("loading")[0].style.display = "none";
-        loaded = false;
       }
       else{ loaded = true; }
     }, false);
@@ -198,57 +224,67 @@ window.onload = function(){
 
   //charge la localisation la plus proche
   function load_geoname(){
-    url = "http://api.geonames.org/extendedFindNearby?"
-          +"lat="+String(position.lat)+"&"
-          +"lng="+String(position.lng)+"&username=cocyte";
-
-    ajax_geoname = new XMLHttpRequest();
-    ajax_geoname.open("GET",url,true);
+    /*
+    * Le wrapper de l'API geoname est une page PHP que j'ai stocké sur un serveur web, pour que la page soit accessible par Internet.
+    * Il est cependant possible de tester le PHP en local, avec un serveur PHP qui redirige vers 'geonameAPI/geoname.PHP'
+    */
+    var url = "https://woodbox.000webhostapp.com/geoname.php";
+    var ajax_geoname = new XMLHttpRequest();
+    ajax_geoname.open("POST",url,true);
+    ajax_geoname.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
     ajax_geoname.onreadystatechange = function(){
       if(ajax_geoname.readyState == 4 && ajax_geoname.status == 200){
-        var xml = ajax_geoname.responseXML;
-        var json_text = JSON.stringify(xml_to_json(xml));   //conversion du xml en json
-        console.log(json_text);
-        var geonames = JSON.parse(json_text).geonames;
-        var location, hashtag;
+        var json_text = ajax_geoname.responseText;
+        var geo = JSON.parse(json_text);
 
-        //définis le type de localisation et le type de texte du tweet
-        if(geonames.address != undefined){
-          location = geonames.address.adminName2;
-          hashtag = "#"+geonames.address.adminName1;
-        }
-        else if(geonames.ocean != undefined){
-          location = "the "+geonames.ocean.name;
-          hashtag = "#BluePlanet"
-        }
-        else if(geonames.geoname.name != null){
-          location = geonames.geoname.name;
-          hashtag = "#"+geonames.geoname.countryName;
-        }
-        else{
-          location = geonames.countryName;
-          hashtag = "";
-        }
-        document.getElementById("preview_txt").innerHTML = "Nice view above "+location+" ! <span class='hashtag'>"+hashtag+" #ISS</span>";
+        var text = set_tweet_text(geo);
+        document.getElementById("preview_txt").innerHTML = text;
 
         if(loaded){
           document.getElementById("preview").style.top = "50%";
           document.getElementsByClassName("loading")[0].style.display = "none";
-          loaded = false;
         }
         else{ loaded = true; }
       }
     };
 
-    ajax_geoname.send();
+    var data="lat="+String(position.lat)+"&lng="+String(position.lng);
+    ajax_geoname.send(data);
+    loaded = false;
+  }
+
+
+  function set_tweet_text(geo){
+    var location, hashtag;
+
+    //définis le type de localisation et le type de texte du tweet
+    if(geo.address != undefined){
+      location = geo.address.adminName2;
+      hashtag = "#"+(geo.address.adminName1).replace(" ","");
+    }
+    else if(geo.ocean != undefined){
+      location = "the "+geo.ocean.name;
+      hashtag = "#BluePlanet"
+    }
+    else if(geo.geoname != undefined){
+      var geo_list = geo.geoname;
+      location = geo_list[geo_list.length-1].name;
+      hashtag = "#"+(geo.geoname[geo_list.length-1].countryName).replace(" ","");
+    }
+    else{
+      location = geo.countryName;
+      hashtag = "";
+    }
+
+    var text = "Nice view above "+location+" ! <span class='hashtag'>@Thom_astro "+hashtag+" #ISS</span>";
+    return text;
   }
 
 
 
 
-
-  //function recursive pour convertir un fichier xml en json
+  //function recursive pour convertir un fichier xml en json (non utilisé)
   function xml_to_json(xml){
     var obj = {};
 
@@ -261,6 +297,5 @@ window.onload = function(){
     }
     return obj;
   }
-
 
 }
