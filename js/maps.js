@@ -18,6 +18,7 @@ window.onload = function(){
   var map_layer, tile_layer, marker,polyline;
   var ajax_position, ajax_geoname;
   var position={lat: 999, lng: 0}, old_position={lat: 0, lng: 0}, zoom_level = 3, tile_layer_option = "street";
+  var first_time;
 
   var loaded = false;
 
@@ -67,12 +68,12 @@ window.onload = function(){
     polyline = L.polyline([], {color: 'green', smoothFactor: 3.0});
 
     tile_layer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-      maxZoom:18,
-    	minZoom:1,
-    	id:tile_layer_option,   //mapbox.mapbox-streets-v7  //mapbox.mapbox-terrain-v2  //mapbox.satellite   //mapbox.streets
-    	accessToken: 'pk.eyJ1IjoiY2FzdG9yYm90IiwiYSI6ImNpaWkweWQ5ajAwaHV1NmtueHV1MHowcHgifQ.2l9JrRXro_ve9S_pMdTB0Q'
-    	});
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+		maxZoom:18,
+		minZoom:1,
+		id:tile_layer_option,   //mapbox.mapbox-streets-v7  //mapbox.mapbox-terrain-v2  //mapbox.satellite   //mapbox.streets
+		accessToken: 'pk.eyJ1IjoiY2FzdG9yYm90IiwiYSI6ImNpaWkweWQ5ajAwaHV1NmtueHV1MHowcHgifQ.2l9JrRXro_ve9S_pMdTB0Q'
+	});
     tile_layer.addTo(map_layer);
 
     set_zoom();
@@ -97,12 +98,14 @@ window.onload = function(){
   function set_debug(){
     clear_map();
     if(debug_option.checked){
-      document.getElementById("debug").style.transform = "translate(0, -50%)";
-      document.getElementById("debug").style.webkitTransform = "translate(0, -50%)";
+      // document.getElementById("debug").style.transform = "translate(0, -50%)";
+      // document.getElementById("debug").style.webkitTransform = "translate(0, -50%)";
+      document.getElementById("debug").classList.add("hidden");
     }
     else{
-      document.getElementById("debug").style.transform = "translate(68%, -50%)";
-      document.getElementById("debug").style.webkitTransform = "translate(68%, -50%)";
+      // document.getElementById("debug").style.transform = "translate(205px, -50%)";
+      // document.getElementById("debug").style.webkitTransform = "translate(205px, -50%)";%)";
+      document.getElementById("debug").classList.remove("hidden");
     }
   }
 
@@ -125,7 +128,7 @@ window.onload = function(){
     map_layer.addLayer(tile_layer);
   }
 
-  function clear_map() {
+  function clear_map(){
     for(i in map_layer._layers) {
       if(map_layer._layers[i]._path != undefined){
         try { map_layer.removeLayer(map_layer._layers[i]); }
@@ -138,32 +141,32 @@ window.onload = function(){
 
   //boucle de requêtes sur la position de l'ISS
   function update(){
-    if(debug_option.checked){    // utilise l'API de position de l'ISS 'faite maison'
-      old_position.lat = position.lat;
-      old_position.lng = position.lng;
-      var result = Location.update_iss(time_factor.value);
+    ajax_position = new XMLHttpRequest();
 
-      position.lat = (result.latitude).toFixed(5);
-      position.lng = (result.longitude).toFixed(5);
-      update_map();
+    var url, data;
+    if(debug_option.checked){
+      if(first_time == undefined){ first_time = parseInt(Date.now()/1000); }
+      data = "?time_factor="+time_factor.value+"&first_time="+first_time;
+      url = "https://woodbox.000webhostapp.com/location.php"+data;
     }
-    else{   // utilise l'API officielle pour avoir la position de l'ISS
-      ajax_position = new XMLHttpRequest();
-      ajax_position.open("GET","http://api.open-notify.org/iss-now.json",true);
-
-      ajax_position.onreadystatechange = function(){
-        if(ajax_position.readyState == 4 && ajax_position.status == 200){
-          var json_result = JSON.parse(ajax_position.responseText);    //on récupère la position au format json
-
-          old_position.lat = position.lat;
-          old_position.lng = position.lng;
-          position.lat = json_result.iss_position.latitude;
-          position.lng = json_result.iss_position.longitude;
-          update_map();
-        }
-      };
-      ajax_position.send();
+    else{
+      url = "https://api.wheretheiss.at/v1/satellites/25544";		// ou http://api.open-notify.org/iss-now.json
     }
+
+    ajax_position.open("GET",url,true);
+    ajax_position.onreadystatechange = function(){
+      if(ajax_position.readyState == 4 && ajax_position.status == 200){
+        console.log(ajax_position.responseText);
+        var json_result = JSON.parse(ajax_position.responseText);    //on récupère la position au format json
+
+        old_position.lat = position.lat;
+        old_position.lng = position.lng;
+        position.lat = (json_result.latitude).toFixed(6);
+        position.lng = (json_result.longitude).toFixed(6);
+        update_map();
+      }
+    };
+    ajax_position.send();
 
     window.setTimeout(update, 2000);    //màj toute les 2 secondes
   }
@@ -172,7 +175,7 @@ window.onload = function(){
   function update_map(){
     marker.setLatLng(position).addTo(map_layer);    //on change la positon du marker
 
-    if(follow_option.checked == true){ map_layer.panTo(position); }     //on change le cadrage de la carte pour suivre l'ISS
+    if(follow_option.checked == true){ map_layer.panTo(position); }     //on change l'emprise de la carte pour suivre l'ISS
 
     if( !(Math.sign(old_position.lng) != Math.sign(position.lng) && Math.abs(position.lng) > 150) && Math.abs(position.lat - old_position.lat) < 7){
       L.polyline([old_position,position], {color: 'green'}).addTo(map_layer);
@@ -224,10 +227,6 @@ window.onload = function(){
 
   //charge la localisation la plus proche
   function load_geoname(){
-    /*
-    * Le wrapper de l'API geoname est une page PHP que j'ai stocké sur un serveur web, pour que la page soit accessible par Internet.
-    * Il est cependant possible de tester le PHP en local, avec un serveur PHP qui redirige vers 'geonameAPI/geoname.PHP'
-    */
     var url = "https://woodbox.000webhostapp.com/geoname.php";
     var ajax_geoname = new XMLHttpRequest();
     ajax_geoname.open("POST",url,true);
